@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="description" content="0x00 前言最近突发奇想想要找个RAT用用，于是就打算自己编译一个gh0st，结果被折腾了两天，过程那个叫一个酸爽，所以这里把踩的坑记录下来，以后也好有个参考。这次编译的源码来自https://github.com/sincoder/gh0st，编译环境是VS 2017 Community on Win7/Win10。本来呢，gh0st这个东西是在VC++6.0上写的，所以用VC编译会更简单一点">
+<meta name="keywords" content="gh0st">
+<meta property="og:type" content="article">
+<meta property="og:title" content="VS 2017上编译gh0st">
+<meta property="og:url" content="http://yoursite.com/2017/09/09/build-gh0st/index.html">
+<meta property="og:site_name" content="Yichin&#39;s Blog">
+<meta property="og:description" content="0x00 前言最近突发奇想想要找个RAT用用，于是就打算自己编译一个gh0st，结果被折腾了两天，过程那个叫一个酸爽，所以这里把踩的坑记录下来，以后也好有个参考。这次编译的源码来自https://github.com/sincoder/gh0st，编译环境是VS 2017 Community on Win7/Win10。本来呢，gh0st这个东西是在VC++6.0上写的，所以用VC编译会更简单一点">
+<meta property="og:locale" content="zh-cn">
+<meta property="og:image" content="http://yoursite.com/2017/09/09/build-gh0st/safeseh.png">
+<meta property="og:image" content="http://yoursite.com/2017/09/09/build-gh0st/_dll.png">
+<meta property="og:image" content="http://yoursite.com/2017/09/09/build-gh0st/preprocess.png">
+<meta property="og:image" content="http://yoursite.com/2017/09/09/build-gh0st/msvcr.png">
+<meta property="og:image" content="http://yoursite.com/2017/09/09/build-gh0st/scrshot.png">
+<meta property="og:updated_time" content="2017-09-08T15:13:55.200Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="VS 2017上编译gh0st">
+<meta name="twitter:description" content="0x00 前言最近突发奇想想要找个RAT用用，于是就打算自己编译一个gh0st，结果被折腾了两天，过程那个叫一个酸爽，所以这里把踩的坑记录下来，以后也好有个参考。这次编译的源码来自https://github.com/sincoder/gh0st，编译环境是VS 2017 Community on Win7/Win10。本来呢，gh0st这个东西是在VC++6.0上写的，所以用VC编译会更简单一点">
+<meta name="twitter:image" content="http://yoursite.com/2017/09/09/build-gh0st/safeseh.png">
+    
+    
+        
+          
+              <link rel="shortcut icon" href="/images/favicon.ico">
+          
+        
+        
+          
+            <link rel="icon" type="image/png" href="/images/COMMAND.png" sizes="192x192">
+          
+        
+        
+          
+            <link rel="apple-touch-icon" sizes="180x180" href="/images/COMMAND.png">
+          
+        
+    
+    <!-- title -->
+    <title>VS 2017上编译gh0st</title>
+    <!-- styles -->
+    <link rel="stylesheet" href="/css/style.css">
+    <!-- rss -->
+    
+    
+</head>
+
+<body>
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#"><i class="fa fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fa fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Writing</a></li>
+        
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        
+        <li><a class="icon" href="/2017/09/08/hello-world/"><i class="fa fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" href="#"><i class="fa fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://yoursite.com/2017/09/09/build-gh0st/"><i class="fa fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://yoursite.com/2017/09/09/build-gh0st/&text=VS 2017上编译gh0st"><i class="fa fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://yoursite.com/2017/09/09/build-gh0st/&title=VS 2017上编译gh0st"><i class="fa fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://yoursite.com/2017/09/09/build-gh0st/&is_video=false&description=VS 2017上编译gh0st"><i class="fa fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=VS 2017上编译gh0st&body=Check out this article: http://yoursite.com/2017/09/09/build-gh0st/"><i class="fa fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://yoursite.com/2017/09/09/build-gh0st/&title=VS 2017上编译gh0st"><i class="fa fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://yoursite.com/2017/09/09/build-gh0st/&title=VS 2017上编译gh0st"><i class="fa fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://yoursite.com/2017/09/09/build-gh0st/&title=VS 2017上编译gh0st"><i class="fa fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://yoursite.com/2017/09/09/build-gh0st/&title=VS 2017上编译gh0st"><i class="fa fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://yoursite.com/2017/09/09/build-gh0st/&name=VS 2017上编译gh0st&description="><i class="fa fa-tumblr " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#0x00-前言"><span class="toc-number">1.</span> <span class="toc-text">0x00 前言</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#0x01-编译Server（被控端）"><span class="toc-number">2.</span> <span class="toc-text">0x01 编译Server（被控端）</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#sys"><span class="toc-number">2.1.</span> <span class="toc-text">sys</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#svchost"><span class="toc-number">2.2.</span> <span class="toc-text">svchost</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#install"><span class="toc-number">2.3.</span> <span class="toc-text">install</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#0x02-编译CJ60Lib"><span class="toc-number">3.</span> <span class="toc-text">0x02 编译CJ60Lib</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#0x03-编译gh0st（主控端）"><span class="toc-number">4.</span> <span class="toc-text">0x03 编译gh0st（主控端）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#0x04-结尾"><span class="toc-number">5.</span> <span class="toc-text">0x04 结尾</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#0xFF-Reference"><span class="toc-number">6.</span> <span class="toc-text">0xFF Reference</span></a></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index width mx-auto px2 my4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        VS 2017上编译gh0st
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">Yichin's Blog</span>
+      </span>
+      
+    <div class="postdate">
+        <time datetime="2017-09-09T15:07:49.000Z" itemprop="datePublished">2017-09-09</time>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/gh0st/">gh0st</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content" itemprop="articleBody">
+    <h3 id="0x00-前言"><a href="#0x00-前言" class="headerlink" title="0x00 前言"></a>0x00 前言</h3><p>最近突发奇想想要找个RAT用用，于是就打算自己编译一个gh0st，结果被折腾了两天，过程那个叫一个酸爽，所以这里把踩的坑记录下来，以后也好有个参考。这次编译的源码来自<a href="https://github.com/sincoder/gh0st" target="_blank" rel="external">https://github.com/sincoder/gh0st</a>，编译环境是VS 2017 Community on Win7/Win10。本来呢，gh0st这个东西是在VC++6.0上写的，所以用VC编译会更简单一点，但是我还想准备以后对源码进行一些扩展，因此想把他移植到VS上，理论上这个操作流程对VS2010 - VS2017都适用。整个过程基本上参照了这位博主的博客<a href="http://ligangelectron.blog.163.com/blog/" target="_blank" rel="external">http://ligangelectron.blog.163.com/blog/</a>（VS 2010编译Gh0st 3.6）所写的内容，不过中间有些不详尽的地方和一些隐藏的坑，我在这里再补充一下。</p>
+<h3 id="0x01-编译Server（被控端）"><a href="#0x01-编译Server（被控端）" class="headerlink" title="0x01 编译Server（被控端）"></a>0x01 编译Server（被控端）</h3><p>这里简单介绍一下，gh0st中主要有五个项目：sys, svchost, install, CJ60Lib, gh0st，其中位于<code>server</code>目录下的sys, svchost和install都是被控端的代码，其作用分别是：驱动程序、DLL（主要功能部分）和加载DLL的exe，位于<code>CJ60Lib</code>目录下的CJ60Lib是gh0st主控端所依赖的一个界面库，而gh0st就是主控端的主要代码了。被控端的编译顺序是sys, svchost, install，咱们一个一个来说。</p>
+<h4 id="sys"><a href="#sys" class="headerlink" title="sys"></a>sys</h4><p>编译驱动文件需要用到Windows Driver Ki，VS2017里没有，需要手动下载安装：<a href="https://developer.microsoft.com/en-us/windows/hardware/windows-driver-kit" target="_blank" rel="external">https://developer.microsoft.com/en-us/windows/hardware/windows-driver-kit</a>，安装完后打开<code>Windows XP Free Build Environment</code>进入sys目录，用<code>build</code>命令编译然后将编译好的<code>ressdt.sys</code>拷进<code>sys</code>目录就好了，这部分网上很多教程都说得比较详细，这里不再赘述。</p>
+<h4 id="svchost"><a href="#svchost" class="headerlink" title="svchost"></a>svchost</h4><p>打开<code>gh0st.sln</code>，升级解决方案，为了让生成的程序能在XP上运行，还需要手动在<strong>每个项目</strong>上面右键选择属性-&gt;常规，把平台工具集那一栏设置为带XP的那个工具集。没有的话打开VS安装程序补上就好了，下文不再重复说明。接下来，接下来按照前言里面那位博主的文章进行编译，修改BUG（一些变量未声明和缺少类型说明符的错误在原文“编译CJ60Lib”一节提到，源代码中很多类似错误），直到能编译通过。注意，这里要修改编译配置为Release Win32，<strong>下面所有项目都要编译为Release Win32，下文不再重复说明</strong>。</p>
+<p>此时虽然能编译通过，但是链接的时候还是会出现<code>模块对于SAFESEH影像是不安全的</code>的错误，这里在项目上右键-&gt;属性-&gt;连接器-&gt;命令行，加入命令<code>/SAFESEN:NO</code>就好了。</p>
+<p><img src="/2017/09/09/build-gh0st/safeseh.png" alt="image"></p>
+<p>到这里应该是能成功得到一个<code>svchost.dll</code>了（在<code>server/install/res/</code>目录下），不过这个DLL在使用过程中还要依赖MSVCR<em>*</em>.dll的C运行库，一般人是不会装这些库的，所以我们需要把动态运行库改成静态库包含在生成的dll里面，方法如下：</p>
+<ul>
+<li>修改所有<code>Server/svchost/svchost.cpp</code>和<code>Server/svchost/common/until.cpp</code>中的<code>#ifdef _DLL</code>为<code>#ifdef GH_DLL</code></li>
+</ul>
+<p><img src="/2017/09/09/build-gh0st/_dll.png" alt="_dll.png"></p>
+<ul>
+<li>打开项目属性-&gt;C/C++-&gt;预处理器，修改预处理器定义中的<code>_DLL</code>为<code>GH_DLL</code></li>
+</ul>
+<p><img src="/2017/09/09/build-gh0st/preprocess.png" alt="preProcess"></p>
+<ul>
+<li>打开项目属性-&gt;链接器-&gt;输入，删掉附加依赖项中的<code>MSVCRT.lib</code></li>
+</ul>
+<p><img src="/2017/09/09/build-gh0st/msvcr.png" alt="mscvr.png"></p>
+<p>进行这些操作的原因是<code>_DLL</code>是VS内部使用的预处理选项，在项目中有这个选项会莫名其妙地依赖MSVCR.lib而VC6之后的MSVCR.lib又会在加载的时候引用MSVCR<em>*</em>.dll动态链接库。至此svchost才算编译成功，接下来编译install</p>
+<h4 id="install"><a href="#install" class="headerlink" title="install"></a>install</h4><p>install不需要修改代码，改一下配置就好了：</p>
+<ul>
+<li>打开项目属性-&gt;链接器-&gt;输入，在忽略默认库中加入<code>msvcrt.dll</code>;</li>
+<li>打开项目属性-&gt;链接器-&gt;系统，修改子系统为<code>窗口（/SUBSYSTEM:WINDOWS）</code>。</li>
+</ul>
+<p>成功编译之后会在<code>gh0st/res/</code>目录下生成一个<code>install.exe</code>，这就是以后的被控端程序了。</p>
+<h3 id="0x02-编译CJ60Lib"><a href="#0x02-编译CJ60Lib" class="headerlink" title="0x02 编译CJ60Lib"></a>0x02 编译CJ60Lib</h3><p>gh0st主控端依赖CJ60Lib，因此要先编译一下CJ60Lib，打开<code>CJ60Lib/CJ60Lib/</code>目录下的dsw文件，按照前言里面那位博主的文章进行修改编译就能成功，不再赘述。这里有个小坑：不要用VS 2010 express版编译CJ60Lib库，因为express版不支持MFC…</p>
+<h3 id="0x03-编译gh0st（主控端）"><a href="#0x03-编译gh0st（主控端）" class="headerlink" title="0x03 编译gh0st（主控端）"></a>0x03 编译gh0st（主控端）</h3><p>gh0st有一个锁硬盘的函数，如果随意更改版权信息的话，这个函数就会重写MBR，导致硬盘无法访问。我们要先干掉这个函数，代码位于<code>gh0st/gh0st.cpp</code> LINE:220，<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">unsigned</span> <span class="keyword">char</span> scode[] =</div><div class="line"><span class="string">"\xb8\x12\x00\xcd\x10\xbd\x18\x7c\xb9\x18\x00\xb8\x01\x13\xbb\x0c"</span></div><div class="line"><span class="string">"\x00\xba\x1d\x0e\xcd\x10\xe2\xfe\x49\x20\x61\x6d\x20\x76\x69\x72"</span></div><div class="line"><span class="string">"\x75\x73\x21\x20\x46\x75\x63\x6b\x20\x79\x6f\x75\x20\x3a\x2d\x29"</span>;</div><div class="line"></div><div class="line"><span class="keyword">int</span> CGh0stApp::KillMBR()</div><div class="line">&#123;</div><div class="line">    HANDLE hDevice;</div><div class="line">    DWORD dwBytesWritten, dwBytesReturned;</div><div class="line">    BYTE pMBR[<span class="number">512</span>] = &#123;<span class="number">0</span>&#125;;</div><div class="line">    ...</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>直接将这个函数return掉就好了。</p>
+<p>接下来同样按照博文进行修改，不过添加<code>#define _WIN32_WINNT 0x0500</code>那一步需要修改为<code>#define _WIN32_WINNT 0x0501</code>，然后再注释掉<code>ThemeUtil.h</code>中的<code>#include &quot;TmSchema.h&quot;</code>，因为VS 2017已经不支持编译运行在win 2000上的MFC程序了。</p>
+<p>编译成功进行链接的时候会发现丢了一个<code>daouuid.lib</code>的库，可能VS2017中已经没有这个库了，从网上搜一个，放到common目录，同时在项目属性-&gt;链接器-&gt;输入-&gt;附加依赖项中加入这个库就好了。再编译就能成功了，下面是运行截图。</p>
+<p><img src="/2017/09/09/build-gh0st/scrshot.png" alt="screenshot"></p>
+<h3 id="0x04-结尾"><a href="#0x04-结尾" class="headerlink" title="0x04 结尾"></a>0x04 结尾</h3><p>以上就是在VS 2017中编译gh0st的大概步骤。感觉能踩的坑都被我踩地差不多了，程序在运行时还有一些BUG，远程操控的时候会crash，有时间再慢慢找原因吧。</p>
+<h3 id="0xFF-Reference"><a href="#0xFF-Reference" class="headerlink" title="0xFF Reference"></a>0xFF Reference</h3><p><a href="http://ligangelectron.blog.163.com/blog/static/124112641201010603413364/" target="_blank" rel="external">VS2010编译Gh0st3.6 (一)</a></p>
+<p><a href="http://ligangelectron.blog.163.com/blog/static/124112641201010612051908/" target="_blank" rel="external">VS2010编译Gh0st3.6 (二)</a></p>
+<p><a href="http://ligangelectron.blog.163.com/blog/static/124112641201010612356621/" target="_blank" rel="external">VS2010编译Gh0st3.6 (三)</a></p>
+<p><a href="http://blog.csdn.net/goosdy/article/details/8096714" target="_blank" rel="external">gh0st远控官方源码编译步骤</a></p>
+<p><a href="http://blog.sina.com.cn/s/blog_6e6798460101j2sy.html" target="_blank" rel="external">Gh0st源代码详细剖析</a></p>
+<p><a href="http://bbs.csdn.net/topics/390106587" target="_blank" rel="external">去掉msvcrt100.dll的依赖的问题</a></p>
+
+  </div>
+</article>
+
+
+
+    </div>
+    
+      <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Writing</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#0x00-前言"><span class="toc-number">1.</span> <span class="toc-text">0x00 前言</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#0x01-编译Server（被控端）"><span class="toc-number">2.</span> <span class="toc-text">0x01 编译Server（被控端）</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#sys"><span class="toc-number">2.1.</span> <span class="toc-text">sys</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#svchost"><span class="toc-number">2.2.</span> <span class="toc-text">svchost</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#install"><span class="toc-number">2.3.</span> <span class="toc-text">install</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#0x02-编译CJ60Lib"><span class="toc-number">3.</span> <span class="toc-text">0x02 编译CJ60Lib</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#0x03-编译gh0st（主控端）"><span class="toc-number">4.</span> <span class="toc-text">0x03 编译gh0st（主控端）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#0x04-结尾"><span class="toc-number">5.</span> <span class="toc-text">0x04 结尾</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#0xFF-Reference"><span class="toc-number">6.</span> <span class="toc-text">0xFF Reference</span></a></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://yoursite.com/2017/09/09/build-gh0st/"><i class="fa fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://yoursite.com/2017/09/09/build-gh0st/&text=VS 2017上编译gh0st"><i class="fa fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://yoursite.com/2017/09/09/build-gh0st/&title=VS 2017上编译gh0st"><i class="fa fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://yoursite.com/2017/09/09/build-gh0st/&is_video=false&description=VS 2017上编译gh0st"><i class="fa fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=VS 2017上编译gh0st&body=Check out this article: http://yoursite.com/2017/09/09/build-gh0st/"><i class="fa fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://yoursite.com/2017/09/09/build-gh0st/&title=VS 2017上编译gh0st"><i class="fa fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://yoursite.com/2017/09/09/build-gh0st/&title=VS 2017上编译gh0st"><i class="fa fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://yoursite.com/2017/09/09/build-gh0st/&title=VS 2017上编译gh0st"><i class="fa fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://yoursite.com/2017/09/09/build-gh0st/&title=VS 2017上编译gh0st"><i class="fa fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://yoursite.com/2017/09/09/build-gh0st/&name=VS 2017上编译gh0st&description="><i class="fa fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+      <ul>
+        <li id="toc"><a class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa fa-list fa-lg" aria-hidden="true"></i> TOC</a></li>
+        <li id="share"><a class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa fa-share-alt fa-lg" aria-hidden="true"></i> Share</a></li>
+        <li id="top" style="display:none"><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a></li>
+        <li id="menu"><a class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa fa-bars fa-lg" aria-hidden="true"></i> Menu</a></li>
+      </ul>
+    </div>
+
+  </div>
+</div>
+
+    
+    <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy; 2017 Yichin Zhu
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Writing</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+</body>
+</html>
+<!-- styles -->
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+<link rel="stylesheet" href="/lib/meslo-LG/styles.css">
+<link rel="stylesheet" href="/lib/justified-gallery/justifiedGallery.min.css">
+
+
+<!-- jquery -->
+<script src="/lib/jquery/jquery.min.js"></script>
+<script src="/lib/justified-gallery/jquery.justifiedGallery.min.js"></script>
+<script src="/js/main.js"></script>
+<!-- Google Analytics -->
+
+    <script type="text/javascript">
+        (function(i,s,o,g,r,a,m) {i['GoogleAnalyticsObject']=r;i[r]=i[r]||function() {
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+        ga('create', 'UA-86660611-1', 'auto');
+        ga('send', 'pageview');
+    </script>
+
+<!-- Disqus Comments -->
+
+
